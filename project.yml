@@ -1,0 +1,40 @@
+name: ChampionsList
+
+options:
+  # postGenCommand: pod install --repo-update
+  indentWidth: 4
+  tabWidth: 4
+  xcodeVersion: 0800
+
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: 13
+
+targets:
+  
+  ChampionsList:
+    type: application
+    platform: iOS
+
+    sources:
+      - path: ChampionsList/
+
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: 1
+        DISPLAYNAME: League of Legends Champions
+        HOST: api.github.com
+        SCHEME: https
+        INFOPLIST_FILE: ChampionsList/Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.helios.championsList
+
+  ChampionsListTests:
+    type: bundle.unit-test
+    platform: iOS
+
+    sources:
+      - path: ChampionsListTests
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.championsListTests

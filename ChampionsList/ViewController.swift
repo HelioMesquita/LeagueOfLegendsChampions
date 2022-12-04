@@ -11,7 +11,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Testing"
+        title = R.string.localizable.welcome.callAsFunction()
         view.backgroundColor = .systemBackground
         // Do any additional setup after loading the view.
     }

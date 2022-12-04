@@ -1,10 +1,10 @@
 name: ChampionsList
 
 options:
-  # postGenCommand: pod install --repo-update
+  postGenCommand: pod install
   indentWidth: 4
   tabWidth: 4
-  xcodeVersion: 0800
+  xcodeVersion: "14.1.0"
 
 settings:
   base:
@@ -18,6 +18,9 @@ targets:
 
     sources:
       - path: ChampionsList/
+      - path: "ChampionsList/Generated/R.generated.swift"
+        optional: true
+        type: file
 
     settings:
       base:
@@ -28,6 +31,13 @@ targets:
         INFOPLIST_FILE: ChampionsList/Resources/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.helios.championsList
 
+    preBuildScripts:
+        - name: R.swift script
+          script: |
+            "$PODS_ROOT/R.swift/rswift" generate "$SRCROOT/ChampionsList/Generated/R.generated.swift"
+          outputFiles:
+          - $SRCROOT/ChampionsList/Generated/R.generated.swift
+            
   ChampionsListTests:
     type: bundle.unit-test
     platform: iOS

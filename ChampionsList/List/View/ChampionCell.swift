@@ -3,8 +3,6 @@ import SDWebImage
 
 class ChampionCell: UICollectionViewCell {
 
-    var titlePadding: CGFloat = 10
-
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -23,16 +21,12 @@ class ChampionCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configureViews()
+        addImageView()
+        addTitleLabel()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    private func configureViews() {
-        addImageView()
-        addTitleLabel()
     }
 
     private func addTitleLabel() {
@@ -54,8 +48,9 @@ class ChampionCell: UICollectionViewCell {
         ])
     }
     
-    func setImage(image: URL) {
-        imageView.sd_setImage(with: image)
+    func setCell(_ champion: ListBuilder.Model.ChampionModel) {
+        titleLabel.text = champion.name
+        imageView.sd_setImage(with: champion.image)
     }
 
 }

@@ -6,13 +6,15 @@ class ListViewController: UIViewController {
     typealias Champion = ListBuilder.Model.ChampionModel
     typealias Section = ListViewModel.Section
     
+    lazy var refreshControl = UIRefreshControlPublisher()
+    
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.register(cellType: ChampionCell.self)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.refreshControl = UIRefreshControl()
+        collectionView.refreshControl = refreshControl
         return collectionView
     }()
     
@@ -32,8 +34,7 @@ class ListViewController: UIViewController {
     lazy var dataSource: UICollectionViewDiffableDataSource<Section, Champion> = {
         var dataSource = UICollectionViewDiffableDataSource<Section, Champion>(collectionView: self.collectionView) { (collectionView, indexPath, element) -> UICollectionViewCell? in
             let cell: ChampionCell = collectionView.dequeueReusableCell(for: indexPath)
-            cell.titleLabel.text = element.name
-            cell.setImage(image: element.image)
+            cell.setCell(element)
             return cell
         }
         return dataSource
@@ -56,16 +57,27 @@ class ListViewController: UIViewController {
         view.backgroundColor = .systemBackground
         addCollectionView()
         
+        refreshControl.pullToRefreshPublisher
+            .map { _ in ListViewInEvent.reload }
+            .subscribe(viewModel.eventSubject)
+            .store(in: &cancellables)
+                
         viewModel.$state
             .sink { [weak self] state in
                 switch state {
                 case .loading:
                     self?.collectionView.refreshControl?.beginRefreshing()
+                    self?.viewModel.eventSubject.send(.load)
                     
                 case .failureLoading(let error):
                     self?.collectionView.refreshControl?.endRefreshing()
-                    let action = UIAlertAction(title: error.localizedDescription, style: .default)
+                    let tryAgain = UIAlertAction(title: R.string.localizable.tryAgain(), style: .default) { [weak self] _ in
+                        self?.viewModel.eventSubject.send(.reload)
+                    }
+                    let cancel = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
                     let presentViewController = UIAlertController(title: error.localizedDescription, message: nil, preferredStyle: .alert)
+                    presentViewController.addAction(tryAgain)
+                    presentViewController.addAction(cancel)
                     self?.present(presentViewController, animated: true)
                     
                 case .success(let model):

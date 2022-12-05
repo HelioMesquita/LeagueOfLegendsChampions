@@ -14,7 +14,7 @@ enum RequestError: Int, Error, LocalizedError {
     case serverError = 500
 
     var localizedDescription: String {
-        return NSLocalizedString(String(describing: self.rawValue), comment: "")
+        return NSLocalizedString(String(describing: self), comment: "")
     }
 
 }

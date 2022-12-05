@@ -6,3 +6,6 @@
 "invalidParser" = "Por favor verifique se há alguma atualização";
 "forbidden" = "Tente novamente mais tarde. Temporariamente bloqueado";
 "serverError" = "Error no servidor, tente novamente";
+"internetError" = "Por favor verifique sua internet e tente novamente";
+"tryAgain" = "Tentar outra vez";
+"cancel" = "Cancelar";

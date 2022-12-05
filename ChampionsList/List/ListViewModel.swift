@@ -8,6 +8,8 @@ enum ListViewOutEvent {
 }
 
 enum ListViewInEvent {
+    case load
+    case reload
     case pullToRefresh
     case viewDidAppear
 }
@@ -28,7 +30,26 @@ class ListViewModel {
     
     init(service: ListService = ListService()) {
         self.service = service
-                
+        
+        eventSubject
+            .sink { [weak self] in
+                self?.handleEvent($0)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func handleEvent(_ event: ListViewInEvent) {
+        switch event {
+        case .reload, .load:
+            load()
+        case .pullToRefresh:
+            break
+        case .viewDidAppear:
+            break
+        }
+    }
+    
+    func load() {
         service.getChampionsList(page: page)
             .receive(on: DispatchQueue.main)
             .sink(

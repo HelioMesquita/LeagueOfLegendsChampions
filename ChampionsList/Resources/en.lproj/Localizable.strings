@@ -6,4 +6,6 @@
 "invalidParser" = "Please check some update in App Store";
 "forbidden" = "Try again later you are temporarily blocked";
 "serverError" = "Error on server, try again";
-
+"internetError" = "Please check your internet and try again";
+"tryAgain" = "Try again";
+"cancel" = "Cancel";

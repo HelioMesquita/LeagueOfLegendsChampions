@@ -34,13 +34,12 @@ extension ServiceProviderProtocol {
             .mapError({ genericError in
                 if let error = genericError as? RequestError {
                     return error
-                } else if let error  = genericError as? URLError {
+                } else if let _ = genericError as? URLError {
                     return .internetError
                 } else {
                     return RequestError.invalidParser
                 }
             })
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 

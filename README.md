@@ -11,3 +11,6 @@ Features
 - [Xcodegen](https://github.com/yonaskolb/XcodeGen)
 - [Internacionalization en, es-419 and pt-BR with R.swift Helper](https://github.com/mac-cain13/R.swift)
 - Dark Mode
+- Modern Collection View
+- MVVM using Combine
+- View Code (UIKit)

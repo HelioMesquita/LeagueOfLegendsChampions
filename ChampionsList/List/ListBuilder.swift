@@ -28,7 +28,7 @@ extension ListBuilder {
         let currentPage: Int
         let hasNextPage: Bool
         
-        struct ChampionModel {
+        struct ChampionModel: Hashable {
             let name: String
             let image: URL
             let tags: [String]

@@ -28,6 +28,10 @@ protocol BaseViewModel {
 
 class ListViewModel: BaseViewModel {
     
+    enum Section: String, CaseIterable {
+        case champion
+    }
+    
     var eventSubject = CurrentValueSubject<AppState, Never>(Loading())
     var cancellables = Set<AnyCancellable>()
     private let service: ListService

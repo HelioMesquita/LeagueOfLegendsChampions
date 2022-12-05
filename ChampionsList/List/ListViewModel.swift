@@ -21,18 +21,15 @@ class Loaded: AppState {
     }
 }
 
-protocol BaseViewModel {
-    var eventSubject: CurrentValueSubject<AppState, Never> { get set }
-    var cancellables: Set<AnyCancellable>  { get set }
-}
-
-class ListViewModel: BaseViewModel {
+class ListViewModel {
     
     enum Section: String, CaseIterable {
         case champion
     }
     
-    var eventSubject = CurrentValueSubject<AppState, Never>(Loading())
+    @Published
+    var state: AppState = Loading()
+
     var cancellables = Set<AnyCancellable>()
     private let service: ListService
     private var page = 1
@@ -48,11 +45,11 @@ class ListViewModel: BaseViewModel {
                     case .finished:
                         break
                     case .failure(_):
-                        self?.eventSubject.send(FailureLoading())
+                        self?.state = FailureLoading()
                     }
                 },
                 receiveValue: { [weak self] model in
-                    self?.eventSubject.send(Loaded(model: model))
+                    self?.state = Loaded(model: model)
                 })
             .store(in: &cancellables)
     }

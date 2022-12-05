@@ -17,7 +17,7 @@ class ListViewController: UIViewController {
     }()
     
     private func createLayout() -> UICollectionViewLayout {
-        return UICollectionViewCompositionalLayout { (sectionIndex, _) -> NSCollectionLayoutSection? in
+        return UICollectionViewCompositionalLayout { (_, _) -> NSCollectionLayoutSection? in
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33), heightDimension: .absolute(76))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
@@ -39,9 +39,7 @@ class ListViewController: UIViewController {
         return dataSource
     }()
     
-    
     private var cancellables = Set<AnyCancellable>()
-//    private let rootView = ListView()
     private let viewModel: ListViewModel
 
     init(viewModel: ListViewModel = ListViewModel()) {
@@ -58,10 +56,14 @@ class ListViewController: UIViewController {
         view.backgroundColor = .systemBackground
         addCollectionView()
         
-        viewModel.eventSubject
+        viewModel.$state
             .sink { [weak self] state in
-                print(state)
+                if state is Loading {
+                    self?.collectionView.refreshControl?.beginRefreshing()
+                }
                 if let state = state as? Loaded {
+                    self?.collectionView.refreshControl?.endRefreshing()
+
                     var snapshot = NSDiffableDataSourceSnapshot<Section, Champion>()
                     snapshot.appendSections([.champion])
                     snapshot.appendItems(state.model.champions, toSection: .champion)
@@ -74,10 +76,10 @@ class ListViewController: UIViewController {
     private func addCollectionView() {
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 

@@ -7,6 +7,7 @@ class ChampionCell: UICollectionViewCell {
 
     lazy var titleLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .white
         label.font = .systemFont(ofSize: 12, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -23,7 +24,6 @@ class ChampionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureViews()
-        backgroundColor = .red
     }
 
     required init?(coder: NSCoder) {
@@ -31,14 +31,14 @@ class ChampionCell: UICollectionViewCell {
     }
 
     private func configureViews() {
-        addTitleLabel()
         addImageView()
+        addTitleLabel()
     }
 
     private func addTitleLabel() {
         addSubview(titleLabel)
         NSLayoutConstraint.activate([
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: titlePadding),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])

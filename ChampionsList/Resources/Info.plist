@@ -19,13 +19,15 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(BundleDisplayName)</string>
+	<string>$(CURRENT_NAME)</string>
 	<key>HOST</key>
 	<string>$(HOST)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>SCHEME</key>
 	<string>$(SCHEME)</string>
+	<key>CURRENT_NAME</key>
+	<string>$(CURRENT_NAME)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

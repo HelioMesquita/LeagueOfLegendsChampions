@@ -9,5 +9,9 @@ extension Bundle {
     var host: String {
         return self.object(forInfoDictionaryKey: "HOST") as! String
     }
+    
+    var displayName: String {
+        return self.object(forInfoDictionaryKey: "CURRENT_NAME") as! String
+    }
 
 }

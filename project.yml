@@ -27,6 +27,7 @@ targets:
       base:
         TARGETED_DEVICE_FAMILY: 1
         INFOPLIST_KEY_CFBundleDisplayName[sdk=iphoneos*]: League of Legends Champions
+        CURRENT_NAME: League of Legends Champions
         HOST: us-central1-whatslol-1460f.cloudfunctions.net
         SCHEME: https
         INFOPLIST_FILE: ChampionsList/Resources/Info.plist

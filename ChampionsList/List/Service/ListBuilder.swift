@@ -7,6 +7,7 @@ class ListBuilder: BuilderProviderProtocol {
         
         return Model(champions: championsModel, currentPage: response.currentPage, hasNextPage: response.hasNextPage)
     }
+
 }
 
 extension ListBuilder {

@@ -14,10 +14,10 @@ class FailureLoading: AppState {
 }
 
 class Loaded: AppState {
-    let response: ListResponse
+    let model: ListBuilder.Model
     
-    init(response: ListResponse) {
-        self.response = response
+    init(model: ListBuilder.Model) {
+        self.model = model
     }
 }
 
@@ -30,10 +30,10 @@ class ListViewModel: BaseViewModel {
     
     var eventSubject = CurrentValueSubject<AppState, Never>(Loading())
     var cancellables = Set<AnyCancellable>()
-    private let service: ListInteractor
+    private let service: ListService
     private var page = 1
     
-    init(service: ListInteractor = ListInteractor()) {
+    init(service: ListService = ListService()) {
         self.service = service
                 
         service.getChampionsList(page: page)
@@ -47,8 +47,8 @@ class ListViewModel: BaseViewModel {
                         self?.eventSubject.send(FailureLoading())
                     }
                 },
-                receiveValue: { [weak self] listResponse in
-                    self?.eventSubject.send(Loaded(response: listResponse))
+                receiveValue: { [weak self] model in
+                    self?.eventSubject.send(Loaded(model: model))
                 })
             .store(in: &cancellables)
     }

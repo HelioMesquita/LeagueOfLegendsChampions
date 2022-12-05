@@ -23,6 +23,7 @@ class ChampionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureViews()
+        backgroundColor = .red
     }
 
     required init?(coder: NSCoder) {

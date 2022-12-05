@@ -23,15 +23,15 @@ class ListViewController: UIViewController {
     }
     
     private func newsSection() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3), heightDimension: .fractionalHeight(0.3))
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33), heightDimension: .absolute(76))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.3), heightDimension: .fractionalHeight(0.3))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitem: item, count: 3)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(76))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 3)
         group.contentInsets = groupContentInsets
 
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .groupPagingCentered
+//        section.orthogonalScrollingBehavior = .groupPagingCentered
 
         return section
     }

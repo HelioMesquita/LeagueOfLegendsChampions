@@ -25,17 +25,20 @@ extension ServiceProviderProtocol {
                 
                 if 200...299 ~= statusCode {
                     return requestData.data
+                } else {
+                    throw try identify(statusCode: statusCode)
                 }
-                
-                throw try identify(statusCode: statusCode)
             }
             .decode(type: BuilderType.ResponseType.self, decoder: jsonDecoder)
             .tryMap({ try builder.build(response: $0) })
             .mapError({ genericError in
                 if let error = genericError as? RequestError {
                     return error
+                } else if let error  = genericError as? URLError {
+                    return .internetError
+                } else {
+                    return RequestError.invalidParser
                 }
-                return RequestError.invalidParser
             })
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()

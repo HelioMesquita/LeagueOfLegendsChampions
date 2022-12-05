@@ -6,6 +6,7 @@ enum RequestError: Int, Error, LocalizedError {
 
     case unknownError = 0
     case invalidParser = 1
+    case internetError = 2
     case badRequest = 400
     case unauthorized = 401
     case forbidden = 403

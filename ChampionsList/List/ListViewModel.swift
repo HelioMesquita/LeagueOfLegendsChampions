@@ -1,34 +1,26 @@
 import Combine
 import Foundation
 
-class AppState {
-    
+enum ListViewOutEvent {
+    case loading
+    case failureLoading(RequestError)
+    case success(ListBuilder.Model)
 }
 
-class Loading: AppState {
-    
-}
-
-class FailureLoading: AppState {
-    
-}
-
-class Loaded: AppState {
-    let model: ListBuilder.Model
-    
-    init(model: ListBuilder.Model) {
-        self.model = model
-    }
+enum ListViewInEvent {
+    case pullToRefresh
+    case viewDidAppear
 }
 
 class ListViewModel {
+    let eventSubject = PassthroughSubject<ListViewInEvent, Never>()
     
     enum Section: String, CaseIterable {
         case champion
     }
     
     @Published
-    var state: AppState = Loading()
+    var state: ListViewOutEvent = .loading
 
     var cancellables = Set<AnyCancellable>()
     private let service: ListService
@@ -44,12 +36,12 @@ class ListViewModel {
                     switch completion {
                     case .finished:
                         break
-                    case .failure(_):
-                        self?.state = FailureLoading()
+                    case .failure(let error):
+                        self?.state = .failureLoading(error)
                     }
                 },
                 receiveValue: { [weak self] model in
-                    self?.state = Loaded(model: model)
+                    self?.state = .success(model)
                 })
             .store(in: &cancellables)
     }

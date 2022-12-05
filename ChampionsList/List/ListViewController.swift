@@ -58,15 +58,21 @@ class ListViewController: UIViewController {
         
         viewModel.$state
             .sink { [weak self] state in
-                if state is Loading {
+                switch state {
+                case .loading:
                     self?.collectionView.refreshControl?.beginRefreshing()
-                }
-                if let state = state as? Loaded {
+                    
+                case .failureLoading(let error):
                     self?.collectionView.refreshControl?.endRefreshing()
-
+                    let action = UIAlertAction(title: error.localizedDescription, style: .default)
+                    let presentViewController = UIAlertController(title: error.localizedDescription, message: nil, preferredStyle: .alert)
+                    self?.present(presentViewController, animated: true)
+                    
+                case .success(let model):
+                    self?.collectionView.refreshControl?.endRefreshing()
                     var snapshot = NSDiffableDataSourceSnapshot<Section, Champion>()
                     snapshot.appendSections([.champion])
-                    snapshot.appendItems(state.model.champions, toSection: .champion)
+                    snapshot.appendItems(model.champions, toSection: .champion)
                     self?.dataSource.apply(snapshot, animatingDifferences: false)
                 }
             }

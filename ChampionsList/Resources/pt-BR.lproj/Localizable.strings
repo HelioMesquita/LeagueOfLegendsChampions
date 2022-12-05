@@ -1,1 +1,8 @@
 "welcome" = "Bem vindo";
+"badRequest" = "Houve algum erro ao carregar seus dados";
+"unauthorized" = "Você não possui autorização para ver esta informação";
+"notFound" = "Não foi encontrado o que você pediu, tente novamente";
+"unknownError" = "Por favor verifique sua internet e tente novamente";
+"invalidParser" = "Por favor verifique se há alguma atualização";
+"forbidden" = "Tente novamente mais tarde. Temporariamente bloqueado";
+"serverError" = "Error no servidor, tente novamente";

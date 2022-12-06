@@ -11,7 +11,7 @@ class UIRefreshControlPublisher: UIRefreshControl {
     
     override init() {
         super.init(frame: .zero)
-        addTarget(self, action: #selector(handleValue), for: .allEvents)
+        addTarget(self, action: #selector(handleValue), for: .valueChanged)
     }
     
     required init?(coder: NSCoder) {

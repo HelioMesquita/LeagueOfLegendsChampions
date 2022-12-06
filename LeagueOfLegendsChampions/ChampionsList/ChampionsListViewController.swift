@@ -15,6 +15,7 @@ class ChampionsListViewController: UIViewController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.refreshControl = refreshControl
+        collectionView.prefetchDataSource = self
         return collectionView
     }()
     
@@ -81,11 +82,12 @@ class ChampionsListViewController: UIViewController {
                     self?.present(presentViewController, animated: true)
                     
                 case .success(let model):
-                    self?.collectionView.refreshControl?.endRefreshing()
+                    guard let `self` = self else { return }
+                    self.collectionView.refreshControl?.endRefreshing()
                     var snapshot = NSDiffableDataSourceSnapshot<Section, Champion>()
                     snapshot.appendSections([.champion])
                     snapshot.appendItems(model.champions, toSection: .champion)
-                    self?.dataSource.apply(snapshot, animatingDifferences: false)
+                    self.dataSource.apply(snapshot, animatingDifferences: false)
                 }
             }
             .store(in: &cancellables)
@@ -99,6 +101,16 @@ class ChampionsListViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+
+}
+
+extension ChampionsListViewController: UICollectionViewDataSourcePrefetching {
+
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            self.viewModel.eventSubject.send(.prefetchNextPage(index: indexPath.row))
+        }
     }
 
 }

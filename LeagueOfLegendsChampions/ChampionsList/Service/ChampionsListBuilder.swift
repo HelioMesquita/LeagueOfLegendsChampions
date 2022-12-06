@@ -35,6 +35,10 @@ extension ChampionsListBuilder {
             let tags: [String]
             let title: String
         }
+
+        func updateModel(_ model: Model) -> Model {
+            Model(champions: self.champions + model.champions, currentPage: model.currentPage, hasNextPage: model.hasNextPage)
+        }
     }
 
 }

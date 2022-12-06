@@ -15,3 +15,10 @@ Features
 - MVVM using Combine
 - View Code (UIKit)
 - Custom elements using Combine
+- Pull-to-Refresh
+- Infinity Scroll using PrefetchItems
+
+Doing
+- Unit tests
+- Snapshots Tests
+- Functional Tests

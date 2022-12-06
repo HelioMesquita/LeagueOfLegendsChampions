@@ -4,7 +4,7 @@ import UIKit
 class ChampionsListViewController: UIViewController {
     
     typealias Champion = ChampionsListBuilder.Model.ChampionModel
-    typealias Section = ChampionsListViewModel.ChampionsListSection
+    typealias Section = ChampionsListSection
     
     lazy var refreshControl = UIRefreshControlPublisher()
     

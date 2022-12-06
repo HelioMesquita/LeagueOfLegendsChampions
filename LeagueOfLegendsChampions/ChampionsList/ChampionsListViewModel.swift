@@ -19,8 +19,7 @@ enum ChampionsListSection: String, CaseIterable {
 
 class ChampionsListViewModel {
 
-    @Published
-    var state: ChampionsViewOutEvent = .loading
+    @Published var state: ChampionsViewOutEvent = .loading
     let eventSubject = PassthroughSubject<ChampionsViewInEvent, Never>()
     
     private var cancellables = Set<AnyCancellable>()

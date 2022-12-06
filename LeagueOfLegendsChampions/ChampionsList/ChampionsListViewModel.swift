@@ -1,34 +1,33 @@
 import Combine
 import Foundation
 
-enum ListViewOutEvent {
+enum ChampionsViewOutEvent {
     case loading
     case failureLoading(RequestError)
-    case success(ListBuilder.Model)
+    case success(ChampionsListBuilder.Model)
 }
 
-enum ListViewInEvent {
+enum ChampionsViewInEvent {
     case load
     case reload
     case pullToRefresh
-    case viewDidAppear
 }
 
-class ListViewModel {
-    let eventSubject = PassthroughSubject<ListViewInEvent, Never>()
-    
-    enum Section: String, CaseIterable {
-        case champion
-    }
-    
-    @Published
-    var state: ListViewOutEvent = .loading
+enum ChampionsListSection: String, CaseIterable {
+    case champion
+}
 
-    var cancellables = Set<AnyCancellable>()
-    private let service: ListService
-    private var page = 1
+class ChampionsListViewModel {
+
+    @Published
+    var state: ChampionsViewOutEvent = .loading
+    let eventSubject = PassthroughSubject<ChampionsViewInEvent, Never>()
     
-    init(service: ListService = ListService()) {
+    private var cancellables = Set<AnyCancellable>()
+    private var page = 1
+    private let service: ChampionsService
+    
+    init(service: ChampionsService = ChampionsService()) {
         self.service = service
         
         eventSubject
@@ -38,18 +37,15 @@ class ListViewModel {
             .store(in: &cancellables)
     }
     
-    func handleEvent(_ event: ListViewInEvent) {
+    func handleEvent(_ event: ChampionsViewInEvent) {
         switch event {
-        case .reload, .load:
+        case .reload, .load, .pullToRefresh:
             load()
-        case .pullToRefresh:
-            break
-        case .viewDidAppear:
-            break
         }
     }
     
     func load() {
+        page = 1
         service.getChampionsList(page: page)
             .receive(on: DispatchQueue.main)
             .sink(

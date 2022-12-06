@@ -48,7 +48,7 @@ class ChampionCell: UICollectionViewCell {
         ])
     }
     
-    func setCell(_ champion: ListBuilder.Model.ChampionModel) {
+    func setCell(_ champion: ChampionsListBuilder.Model.ChampionModel) {
         titleLabel.text = champion.name
         imageView.sd_setImage(with: champion.image)
     }

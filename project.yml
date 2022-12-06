@@ -1,4 +1,4 @@
-name: ChampionsList
+name: LeagueOfLegendsChampions
 
 options:
   postGenCommand: pod install
@@ -13,13 +13,13 @@ settings:
 
 targets:
   
-  ChampionsList:
+  LeagueOfLegendsChampions:
     type: application
     platform: iOS
 
     sources:
-      - path: ChampionsList/
-      - path: "ChampionsList/Generated/R.generated.swift"
+      - path: LeagueOfLegendsChampions/
+      - path: "LeagueOfLegendsChampions/Generated/R.generated.swift"
         optional: true
         type: file
 
@@ -30,23 +30,23 @@ targets:
         CURRENT_NAME: League of Legends Champions
         HOST: us-central1-whatslol-1460f.cloudfunctions.net
         SCHEME: https
-        INFOPLIST_FILE: ChampionsList/Resources/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: com.helios.championsList
+        INFOPLIST_FILE: LeagueOfLegendsChampions/Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.helios.LeagueOfLegendsChampions
 
     preBuildScripts:
         - name: R.swift script
           script: |
-            "$PODS_ROOT/R.swift/rswift" generate "$SRCROOT/ChampionsList/Generated/R.generated.swift"
+            "$PODS_ROOT/R.swift/rswift" generate "$SRCROOT/LeagueOfLegendsChampions/Generated/R.generated.swift"
           outputFiles:
-          - $SRCROOT/ChampionsList/Generated/R.generated.swift
+          - $SRCROOT/LeagueOfLegendsChampions/Generated/R.generated.swift
             
-  ChampionsListTests:
+  LeagueOfLegendsChampionsTests:
     type: bundle.unit-test
     platform: iOS
 
     sources:
-      - path: ChampionsListTests
+      - path: LeagueOfLegendsChampionsTests
 
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.championsListTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.LeagueOfLegendsChampionsTests

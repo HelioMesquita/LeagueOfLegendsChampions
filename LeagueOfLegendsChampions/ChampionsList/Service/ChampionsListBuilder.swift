@@ -1,8 +1,8 @@
 import Foundation
 
-class ListBuilder: BuilderProviderProtocol {
+class ChampionsListBuilder: BuilderProviderProtocol {
     
-    func build(response: ListBuilder.Response) throws -> ListBuilder.Model {
+    func build(response: ChampionsListBuilder.Response) throws -> ChampionsListBuilder.Model {
         let championsModel = response.champions.compactMap({ Model.ChampionModel(name: $0.name, image: $0.image, tags: $0.tags, title: $0.title) })
         
         return Model(champions: championsModel, currentPage: response.currentPage, hasNextPage: response.hasNextPage)
@@ -10,7 +10,7 @@ class ListBuilder: BuilderProviderProtocol {
 
 }
 
-extension ListBuilder {
+extension ChampionsListBuilder {
     struct Response: Decodable {
         let champions: [Champion]
         let currentPage: Int

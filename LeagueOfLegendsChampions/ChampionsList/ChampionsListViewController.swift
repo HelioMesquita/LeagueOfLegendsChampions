@@ -1,10 +1,10 @@
 import Combine
 import UIKit
 
-class ListViewController: UIViewController {
+class ChampionsListViewController: UIViewController {
     
-    typealias Champion = ListBuilder.Model.ChampionModel
-    typealias Section = ListViewModel.Section
+    typealias Champion = ChampionsListBuilder.Model.ChampionModel
+    typealias Section = ChampionsListViewModel.ChampionsListSection
     
     lazy var refreshControl = UIRefreshControlPublisher()
     
@@ -41,9 +41,9 @@ class ListViewController: UIViewController {
     }()
     
     private var cancellables = Set<AnyCancellable>()
-    private let viewModel: ListViewModel
+    private let viewModel: ChampionsListViewModel
 
-    init(viewModel: ListViewModel = ListViewModel()) {
+    init(viewModel: ChampionsListViewModel = ChampionsListViewModel()) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -58,7 +58,7 @@ class ListViewController: UIViewController {
         addCollectionView()
         
         refreshControl.pullToRefreshPublisher
-            .map { _ in ListViewInEvent.reload }
+            .map { _ in ChampionsViewInEvent.pullToRefresh }
             .subscribe(viewModel.eventSubject)
             .store(in: &cancellables)
                 

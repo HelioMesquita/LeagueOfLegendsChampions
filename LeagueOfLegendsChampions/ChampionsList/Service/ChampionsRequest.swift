@@ -1,6 +1,6 @@
 import Foundation
 
-class ListRequest: RequestProviderProtocol {
+class ChampionsRequest: RequestProviderProtocol {
 
     var httpVerb: HttpVerbs = .GET
     var path: String = "/champions"

@@ -14,10 +14,15 @@ extension ServiceProviderProtocol {
     }
     
     func execute<BuilderType: BuilderProviderProtocol>(request: RequestProviderProtocol, builder: BuilderType) -> AnyPublisher<BuilderType.ModelType, RequestError> {
+        
+        guard let urlRequest = try? request.asURLRequest() else {
+            return Fail(error: RequestError.invalidURL).eraseToAnyPublisher()
+        }
+        
         return urlSession
-            .dataTaskPublisher(for: request.asURLRequest)
+            .dataTaskPublisher(for: urlRequest)
             .tryMap { requestData in
-                Logger.show(request: request.asURLRequest, requestData)
+                Logger.show(request: urlRequest, requestData)
                 guard let httpResponse = requestData.response as? HTTPURLResponse else {
                     throw RequestError.unknownError
                 }

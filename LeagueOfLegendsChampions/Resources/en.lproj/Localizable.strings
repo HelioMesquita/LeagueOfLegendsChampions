@@ -3,9 +3,10 @@
 "unauthorized" = "You are not authorized to see this information";
 "notFound" = "Could not find what you requested, please try again";
 "unknownError" = "Please check your internet and try again";
-"invalidParser" = "Please check some update in App Store";
+"invalidParser" = "Please check App Store for updates";
 "forbidden" = "Try again later you are temporarily blocked";
 "serverError" = "Error on server, try again";
 "internetError" = "Please check your internet and try again";
 "tryAgain" = "Try again";
 "cancel" = "Cancel";
+"invalidURL" = "Please check App Store for updates";

@@ -1,10 +1,3 @@
-//
-//  BuilderProviderProtocol.swift
-//  ChampionsList
-//
-//  Created by Hélio Mesquita on 05/12/22.
-//
-
 import Foundation
 
 protocol BuilderProviderProtocol {

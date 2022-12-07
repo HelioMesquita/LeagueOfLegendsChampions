@@ -9,3 +9,4 @@
 "internetError" = "Por favor revise su internet inténtelo de nuevo";
 "tryAgain" = "Intentar otra vez";
 "cancel" = "Cancelar";
+"invalidURL" = "Por favor revise alguna actualización";

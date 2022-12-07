@@ -8,7 +8,7 @@ protocol RequestProviderProtocol {
     var queryParameters: [URLQueryItem]? { get }
     var headers: [String: String] { get }
     var httpVerb: HttpVerbs { get }
-    var asURLRequest: URLRequest { get }
+    func asURLRequest() throws -> URLRequest
 }
 
 extension RequestProviderProtocol {
@@ -33,14 +33,18 @@ extension RequestProviderProtocol {
         return ["Content-Type": "application/json"]
     }
 
-    var asURLRequest: URLRequest {
+    func asURLRequest() throws -> URLRequest {
         var components = URLComponents()
         components.scheme = scheme
         components.host = host
         components.path = path
         components.queryItems = queryParameters
+        
+        guard let url = components.url else {
+            throw RequestError.invalidURL
+        }
 
-        var request = URLRequest(url: components.url!)
+        var request = URLRequest(url: url)
         request.httpMethod = httpVerb.rawValue
         headers.forEach { request.addValue($0.value, forHTTPHeaderField: $0.key) }
 

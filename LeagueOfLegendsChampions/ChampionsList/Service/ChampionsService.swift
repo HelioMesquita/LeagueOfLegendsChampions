@@ -1,7 +1,11 @@
 import Combine
 import UIKit
 
-class ChampionsService {
+protocol ChampionsServiceProtocol {
+    func getChampionsList(page: Int, language: String) -> AnyPublisher<ChampionsListBuilder.Model, RequestError>
+}
+
+class ChampionsService: ChampionsServiceProtocol {
     
     private let serviceProvider: ServiceProviderProtocol
 
@@ -9,7 +13,7 @@ class ChampionsService {
         self.serviceProvider = serviceProvider
     }
 
-    func getChampionsList(page: Int = 1, language: String = Locale.preferredLanguages[0] as String) -> AnyPublisher<ChampionsListBuilder.Model, RequestError> {
+    func getChampionsList(page: Int, language: String) -> AnyPublisher<ChampionsListBuilder.Model, RequestError> {
         let request = ChampionsRequest(language: language, page: page)
         return serviceProvider.execute(request: request, builder: ChampionsListBuilder())
     }

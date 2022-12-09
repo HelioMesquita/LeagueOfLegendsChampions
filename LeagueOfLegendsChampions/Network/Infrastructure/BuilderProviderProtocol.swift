@@ -13,4 +13,5 @@ extension BuilderProviderProtocol {
     func build(response: Decodable) throws -> ModelType {
         throw NSError(domain: "missing implementation", code: 0)
     }
+
 }

@@ -68,6 +68,8 @@ schemes:
       language: "Portuguese (Brasil)"
       regison: "Brazil"
       gatherCoverageData: true
+      coverageTargets:
+        - LeagueOfLegendsChampions 
       targets:
         - name: LeagueOfLegendsChampionsTests
           parallelizable: true

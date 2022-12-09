@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-enum ChampionsViewOutEvent {
+enum ChampionsViewOutEvent {    
     case loading
     case failureLoading(RequestError)
     case success(ChampionsListBuilder.Model)
@@ -9,8 +9,6 @@ enum ChampionsViewOutEvent {
 
 enum ChampionsViewInEvent {
     case load
-    case reload
-    case pullToRefresh
     case prefetchNextPage(index: Int)
 }
 
@@ -20,15 +18,15 @@ enum ChampionsListSection: String, CaseIterable {
 
 class ChampionsListViewModel {
 
-    @Published var state: ChampionsViewOutEvent = .loading
+    @Published private(set) var state: ChampionsViewOutEvent = .loading
     let eventSubject = PassthroughSubject<ChampionsViewInEvent, Never>()
     
     private var cancellables = Set<AnyCancellable>()
     private var page = 1
     private var model: ChampionsListBuilder.Model?
-    private let service: ChampionsService
+    private let service: ChampionsServiceProtocol
     
-    init(service: ChampionsService = ChampionsService()) {
+    init(service: ChampionsServiceProtocol = ChampionsService()) {
         self.service = service
         
         eventSubject
@@ -38,7 +36,7 @@ class ChampionsListViewModel {
     
     func handleEvent(_ event: ChampionsViewInEvent) {
         switch event {
-        case .reload, .load, .pullToRefresh:
+        case .load:
             page = 1
             model = nil
             load()
@@ -54,7 +52,7 @@ class ChampionsListViewModel {
     }
     
     func load() {
-        service.getChampionsList(page: page)
+        service.getChampionsList(page: page, language: Locale.preferredLanguages[0] as String)
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in

@@ -9,8 +9,6 @@ target 'LeagueOfLegendsChampions' do
     inherit! :search_paths
     pod 'Quick', '6.1.0'
     pod 'Nimble', '11.2.1'
-    pod 'Nimble-Snapshots', '9.5.0'
-    pod 'iOSSnapshotTestCase', '8.0.0'
   end
 
 end

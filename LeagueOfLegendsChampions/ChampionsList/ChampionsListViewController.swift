@@ -59,7 +59,9 @@ class ChampionsListViewController: UIViewController {
         addCollectionView()
         
         refreshControl.pullToRefreshPublisher
-            .map { _ in ChampionsViewInEvent.pullToRefresh }
+            .map { _ in
+                ChampionsViewInEvent.load
+            }
             .subscribe(viewModel.eventSubject)
             .store(in: &cancellables)
                 
@@ -73,7 +75,7 @@ class ChampionsListViewController: UIViewController {
                 case .failureLoading(let error):
                     self?.collectionView.refreshControl?.endRefreshing()
                     let tryAgain = UIAlertAction(title: R.string.localizable.tryAgain(), style: .default) { [weak self] _ in
-                        self?.viewModel.eventSubject.send(.reload)
+                        self?.viewModel.eventSubject.send(.load)
                     }
                     let cancel = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
                     let presentViewController = UIAlertController(title: error.localizedDescription, message: nil, preferredStyle: .alert)

@@ -69,9 +69,8 @@ class ChampionsListViewModelTests: XCTestCase {
                                                    currentPage: 1, hasNextPage: true)
         mockService.mockResult = Result.success(mockModel).publisher.eraseToAnyPublisher()
         sut.eventSubject.send(.load)
-        
 
-        sut.$state.dropFirst().sink { state in
+        sut.$state.dropFirst().first().sink { state in
             switch state {
             case .loading:
                 break
@@ -79,13 +78,12 @@ class ChampionsListViewModelTests: XCTestCase {
                 break
             case .success(_):
                 self.sut.eventSubject.send(.prefetchNextPage(index: 0))
-                self.sut.$state.dropFirst().sink { state in
+                self.sut.$state.dropFirst().sink { _ in
                     XCTAssertEqual(self.mockService.pageLoading, 2)
                     expectation.fulfill()
                 }.store(in: &self.cancellables)
             }
         }.store(in: &cancellables)
-
 
         wait(for: [expectation], timeout: 10)
     }

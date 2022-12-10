@@ -2,14 +2,13 @@
 
 [![Swift 5.3](https://img.shields.io/badge/Swift-5.3-blue.svg?style=flat)](https://swift.org)
 [![Xcode 14.1.0](https://img.shields.io/badge/Xcode-14.1.0-blue.svg?style=flat)](https://developer.apple.com/xcode/)
-[![Cocoapods 11.1.3](https://img.shields.io/badge/cocoapods-compatible-brightgreen.svg?style=flat)](https://cocoapods.org)
 
 This is a sample app using MVVM with Combine and others things
 
 ## Features
 
 - [Xcodegen](https://github.com/yonaskolb/XcodeGen)
-- [Internacionalization en, es-419 and pt-BR with R.swift Helper](https://github.com/mac-cain13/R.swift)
+- Internacionalization
 - Dark Mode
 - Modern Collection View
 - MVVM using Combine
@@ -23,7 +22,6 @@ This is a sample app using MVVM with Combine and others things
 
 * [Xcode](https://developer.apple.com/xcode/) 14.1.0
 * [Xcodegen](https://github.com/yonaskolb/XcodeGen) 2.32.0
-* [Cocoapods](https://cocoapods.org) 1.11.3
 
 ### Installing
 
@@ -39,9 +37,8 @@ Go to cloned directory and execute
 xcodegen generate
 ```
 
-Double tap on LeagueOfLegendsChampions.xcworkspace
+Double tap on LeagueOfLegendsChampions.xcodeproj
 
 ## Built With
 
 * [SDWebImage](https://github.com/SDWebImage/SDWebImage) - Asynchronous image downloader with cache support as a UIImageView category
-* [R.swift](https://github.com/mac-cain13/R.swift) - Get strong typed, autocompleted resources like images, fonts and segues in Swift projects

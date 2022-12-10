@@ -38,3 +38,22 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.LeagueOfLegendsChampionsTests
         INFOPLIST_FILE: LeagueOfLegendsChampionsTests/Info.plist
+
+schemes:
+  LeagueOfLegendsChampions:
+    build:
+      targets:
+        LeagueOfLegendsChampions: all
+    run:
+      config: Debug
+      debugEnabled: true
+    test:
+      config: Debug
+      language: "Portuguese (Brasil)"
+      regison: "Brazil"
+      gatherCoverageData: true
+      coverageTargets:
+        - LeagueOfLegendsChampions 
+      targets:
+        - name: LeagueOfLegendsChampionsTests
+          parallelizable: true

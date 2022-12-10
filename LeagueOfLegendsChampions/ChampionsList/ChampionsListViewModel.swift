@@ -1,10 +1,24 @@
 import Combine
 import Foundation
 
-enum ChampionsViewOutEvent {    
+enum ChampionsViewOutEvent: Equatable {
+    
     case loading
     case failureLoading(RequestError)
     case success(ChampionsListBuilder.Model)
+    
+    static func == (lhs: ChampionsViewOutEvent, rhs: ChampionsViewOutEvent) -> Bool {
+        switch (lhs, rhs) {
+        case (.loading, .loading):
+            return true
+        case (.failureLoading, .failureLoading):
+            return true
+        case (.success, .success):
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 enum ChampionsViewInEvent {
@@ -23,7 +37,7 @@ class ChampionsListViewModel {
     
     private var cancellables = Set<AnyCancellable>()
     private var page = 1
-    private var model: ChampionsListBuilder.Model?
+    fileprivate var model: ChampionsListBuilder.Model?
     private let service: ChampionsServiceProtocol
     
     init(service: ChampionsServiceProtocol = ChampionsService()) {
@@ -34,7 +48,7 @@ class ChampionsListViewModel {
             .store(in: &cancellables)
     }
     
-    func handleEvent(_ event: ChampionsViewInEvent) {
+    private func handleEvent(_ event: ChampionsViewInEvent) {
         switch event {
         case .load:
             page = 1
@@ -51,7 +65,7 @@ class ChampionsListViewModel {
         }
     }
     
-    func load() {
+    private func load() {
         service.getChampionsList(page: page, language: Locale.preferredLanguages[0] as String)
             .receive(on: DispatchQueue.main)
             .sink(
@@ -70,7 +84,7 @@ class ChampionsListViewModel {
             .store(in: &cancellables)
     }
     
-    func handleModel(_ model: ChampionsListBuilder.Model) -> ChampionsListBuilder.Model {
+    private func handleModel(_ model: ChampionsListBuilder.Model) -> ChampionsListBuilder.Model {
         let newModel = self.model?.updateModel(model) ?? model
         self.model = newModel
         return newModel

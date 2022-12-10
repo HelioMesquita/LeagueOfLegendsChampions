@@ -1,88 +1,104 @@
 import Combine
-import Quick
-import Nimble
+import XCTest
 
 @testable import LeagueOfLegendsChampions
 
-class ChampionsListViewModelTests: QuickSpec {
+class ChampionsListViewModelTests: XCTestCase {
     
-    var cancellables = Set<AnyCancellable>()
     var mockService: MockChampinsListService!
-
-    override func spec() {
-        super.spec()
-        
-        beforeEach {
-            self.mockService = MockChampinsListService()
-        }
-
-        describe("#init") {
-            it("shoulds do nothing when did not receive a subject") {
-                let _ = ChampionsListViewModel(service: self.mockService)
-                expect(self.mockService.hasCalled).to(beFalse())
-            }
-            context("when receive a subject in load state") {
-                context("and success a perform request") {
-                    it("shoulds perform a loading and returns a model") {
-                        let sut = ChampionsListViewModel(service: self.mockService)
-                        sut.eventSubject.send(.load)
-                        waitUntil { done in
-                            switch sut.state {
-                            case .loading:
-                                expect(true).to(beTrue())
-                            case .failureLoading(_):
-                                XCTFail()
-                            case .success(_):
-                                expect(true).to(beTrue())
-                                done()
-                            }
-                        }
-                    }
-                }
-                context("and failure a perform request") {
-                    it("shoulds perform a loading and failure state") {
-                        let sut = ChampionsListViewModel(service: self.mockService)
-                        self.mockService.forceError = true
-                        sut.eventSubject.send(.load)
-                        waitUntil { done in
-                            switch sut.state {
-                            case .loading:
-                                expect(true).to(beTrue())
-                            case .failureLoading(_):
-                                expect(true).to(beTrue())
-                                done()
-                            case .success(_):
-                                XCTFail()
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    var sut: ChampionsListViewModel!
+    var cancellables: Set<AnyCancellable> = []
+    
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        mockService = MockChampinsListService()
+        sut = ChampionsListViewModel(service: mockService)
     }
+    
+    override func tearDownWithError() throws {
+        mockService = nil
+        sut = nil
+        try super.tearDownWithError()
+    }
+    
+    func testWhenViewControllerStartToObsverveItReturnsLoadingState() {
+        let expectation = XCTestExpectation(description: "Start to be observable")
+        
+        sut.$state.sink { state in
+            XCTAssertEqual(state, .loading)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 1)
+    }
+    
+    func testWhenViewControllerSendLoadEventAndItReturnsSuccessState() {
+        let expectation = XCTestExpectation(description: "Request successfully")
+        let mockModel = ChampionsListBuilder.Model(champions: [], currentPage: 1, hasNextPage: true)
+        
+        sut.$state.dropFirst().sink { state in
+            XCTAssertEqual(state, .success(mockModel))
+            expectation.fulfill()
+        }.store(in: &cancellables)
+        
+        mockService.mockResult = Result.success(mockModel).publisher.eraseToAnyPublisher()
+        sut.eventSubject.send(.load)
+        XCTAssertEqual(mockService.pageLoading, 1)
+        wait(for: [expectation], timeout: 1)
+    }
+    
+    func testWhenViewControllerSendLoadEventAndItReturnsFailureState() {
+        let expectation = XCTestExpectation(description: "Request failed")
+        
+        sut.$state.dropFirst().sink { state in
+            XCTAssertEqual(state, .failureLoading(RequestError.unknownError))
+            expectation.fulfill()
+        }.store(in: &cancellables)
+        
+        mockService.mockResult = Result.failure(RequestError.unknownError).publisher.eraseToAnyPublisher()
+        sut.eventSubject.send(.load)
+        XCTAssertEqual(mockService.pageLoading, 1)
+        wait(for: [expectation], timeout: 1)
+    }
+    
+    
+    func testWhenViewControllerSendPrefetchNextPageAndHasNextPageItReturnsCurrentPagePlusOne() {
+        let expectation = XCTestExpectation(description: "Request successfully")
+        let mockModel = ChampionsListBuilder.Model(champions: [], currentPage: 1, hasNextPage: true)
+        mockService.mockResult = Result.success(mockModel).publisher.eraseToAnyPublisher()
+        sut.model = mockModel
+//        sut.eventSubject.send(.load)
 
+        sut.$state.dropFirst().sink { state in
+            XCTAssertEqual(state, .success(mockModel))
+            XCTAssertEqual(self.mockService.pageLoading, 2)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
+
+
+        sut.eventSubject.send(.prefetchNextPage(index: 0))
+
+        wait(for: [expectation], timeout: 1)
+    }
+    
 }
 
 class MockChampinsListService: ChampionsServiceProtocol {
     
-    var hasCalled = false
-    var forceError = false
+    var mockResult: AnyPublisher<LeagueOfLegendsChampions.ChampionsListBuilder.Model, LeagueOfLegendsChampions.RequestError>!
+    var pageLoading: Int!
     
     func getChampionsList(page: Int, language: String) -> AnyPublisher<LeagueOfLegendsChampions.ChampionsListBuilder.Model, LeagueOfLegendsChampions.RequestError> {
-        hasCalled = true
- 
-        let mockModel = LeagueOfLegendsChampions.ChampionsListBuilder.Model(champions: [], currentPage: 1, hasNextPage: true)
-        let valueChangedSubject = PassthroughSubject<LeagueOfLegendsChampions.ChampionsListBuilder.Model,
-                                                                  LeagueOfLegendsChampions.RequestError>()
-        if forceError {
-            valueChangedSubject.send(completion: .failure(RequestError.unknownError))
-        } else {
-            valueChangedSubject.send(mockModel)
-        }
-        
-        
-        return valueChangedSubject.eraseToAnyPublisher()
+        pageLoading = page
+        return mockResult
     }
     
+}
+
+extension ChampionsListViewModel {
     
+    func injectMockModel(model: ChampionsListBuilder.Model) {
+        self.model = model
+    }
 }

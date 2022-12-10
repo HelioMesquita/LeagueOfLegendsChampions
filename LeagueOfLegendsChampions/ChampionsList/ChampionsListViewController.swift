@@ -74,10 +74,10 @@ class ChampionsListViewController: UIViewController {
 
                 case .failure(let error):
                     self?.collectionView.refreshControl?.endRefreshing()
-                    let tryAgain = UIAlertAction(title: R.string.localizable.tryAgain(), style: .default) { [weak self] _ in
+                    let tryAgain = UIAlertAction(title: "tryAgain".localized(), style: .default) { [weak self] _ in
                         self?.viewModel.eventSubject.send(.load)
                     }
-                    let cancel = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
+                    let cancel = UIAlertAction(title: "cancel".localized(), style: .cancel)
                     let presentViewController = UIAlertController(title: error.localizedDescription, message: nil, preferredStyle: .alert)
                     presentViewController.addAction(tryAgain)
                     presentViewController.addAction(cancel)

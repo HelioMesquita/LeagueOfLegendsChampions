@@ -1,28 +1,20 @@
 name: LeagueOfLegendsChampions
 
-options:
-  postGenCommand: pod install
-  indentWidth: 4
-  tabWidth: 4
-  xcodeVersion: "14.1.0"
-
+packages:
+  SDWebImage:
+    url: https://github.com/SDWebImage/SDWebImage
+    majorVersion: 5.0.0
 settings:
   base:
     IPHONEOS_DEPLOYMENT_TARGET: 13
     TARGETED_DEVICE_FAMILY: 1
 
 targets:
-  
   LeagueOfLegendsChampions:
     type: application
     platform: iOS
-
     sources:
       - path: LeagueOfLegendsChampions/
-      - path: "LeagueOfLegendsChampions/Generated/R.generated.swift"
-        optional: true
-        type: file
-
     settings:
       base:
         TARGETED_DEVICE_FAMILY: 1
@@ -32,44 +24,17 @@ targets:
         SCHEME: https
         INFOPLIST_FILE: LeagueOfLegendsChampions/Resources/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.helios.LeagueOfLegendsChampions
+    dependencies:
+      - package: SDWebImage
 
-    preBuildScripts:
-        - name: R.swift script
-          script: |
-            "$PODS_ROOT/R.swift/rswift" generate "$SRCROOT/LeagueOfLegendsChampions/Generated/R.generated.swift"
-          outputFiles:
-          - $SRCROOT/LeagueOfLegendsChampions/Generated/R.generated.swift
-            
   LeagueOfLegendsChampionsTests:
     type: bundle.unit-test
     platform: iOS
-
     dependencies:
       - target: LeagueOfLegendsChampions
-
     sources:
       - path: LeagueOfLegendsChampionsTests
-
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.LeagueOfLegendsChampionsTests
         INFOPLIST_FILE: LeagueOfLegendsChampionsTests/Info.plist
-
-schemes:
-  LeagueOfLegendsChampions:
-    build:
-      targets:
-        LeagueOfLegendsChampions: all
-    run:
-      config: Debug
-      debugEnabled: true
-    test:
-      config: Debug
-      language: "Portuguese (Brasil)"
-      regison: "Brazil"
-      gatherCoverageData: true
-      coverageTargets:
-        - LeagueOfLegendsChampions 
-      targets:
-        - name: LeagueOfLegendsChampionsTests
-          parallelizable: true

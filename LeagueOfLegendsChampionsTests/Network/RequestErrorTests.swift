@@ -5,7 +5,7 @@ import XCTest
 class RequestErrorTests: XCTestCase {
 
     func testLocalizedDescription() {
-        XCTAssertEqual(RequestError.badRequest.localizedDescription, R.string.localizable.badRequest())
+        XCTAssertEqual(RequestError.badRequest.localizedDescription, "badRequest".localized())
     }
 
 }

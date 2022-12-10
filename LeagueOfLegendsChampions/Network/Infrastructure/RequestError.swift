@@ -8,7 +8,7 @@ enum RequestError: Int, Error, LocalizedError {
     case invalidParser = 1
     case internetError = 2
     case invalidURL = 3
-    
+
     case badRequest = 400
     case unauthorized = 401
     case forbidden = 403

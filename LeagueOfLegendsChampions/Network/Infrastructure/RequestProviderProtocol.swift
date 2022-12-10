@@ -12,7 +12,7 @@ protocol RequestProviderProtocol {
 }
 
 extension RequestProviderProtocol {
-    
+
     var scheme: String {
         return Bundle.main.scheme
     }
@@ -39,7 +39,7 @@ extension RequestProviderProtocol {
         components.host = host
         components.path = path
         components.queryItems = queryParameters
-        
+
         guard let url = components.url else {
             throw RequestError.invalidURL
         }

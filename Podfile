@@ -7,8 +7,6 @@ target 'LeagueOfLegendsChampions' do
 
   target 'LeagueOfLegendsChampionsTests' do
     inherit! :search_paths
-    pod 'Quick', '6.1.0'
-    pod 'Nimble', '11.2.1'
   end
 
 end

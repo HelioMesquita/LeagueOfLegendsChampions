@@ -2,12 +2,12 @@ import Combine
 import UIKit
 
 class ChampionsListViewController: UIViewController {
-    
+
     typealias Champion = ChampionsListBuilder.Model.ChampionModel
     typealias Section = ChampionsListSection
-    
+
     lazy var refreshControl = UIRefreshControlPublisher()
-    
+
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.register(cellType: ChampionCell.self)
@@ -18,7 +18,7 @@ class ChampionsListViewController: UIViewController {
         collectionView.prefetchDataSource = self
         return collectionView
     }()
-    
+
     private func createLayout() -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { (_, _) -> NSCollectionLayoutSection? in
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33), heightDimension: .absolute(76))
@@ -31,7 +31,7 @@ class ChampionsListViewController: UIViewController {
             return section
         }
     }
-    
+
     lazy var dataSource: UICollectionViewDiffableDataSource<Section, Champion> = {
         var dataSource = UICollectionViewDiffableDataSource<Section, Champion>(collectionView: self.collectionView) { (collectionView, indexPath, element) -> UICollectionViewCell? in
             let cell: ChampionCell = collectionView.dequeueReusableCell(for: indexPath)
@@ -40,7 +40,7 @@ class ChampionsListViewController: UIViewController {
         }
         return dataSource
     }()
-    
+
     private var cancellables = Set<AnyCancellable>()
     private let viewModel: ChampionsListViewModel
 
@@ -57,22 +57,22 @@ class ChampionsListViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         addCollectionView()
-        
+
         refreshControl.pullToRefreshPublisher
             .map { _ in
                 ChampionsViewInEvent.load
             }
             .subscribe(viewModel.eventSubject)
             .store(in: &cancellables)
-                
+
         viewModel.$state
             .sink { [weak self] state in
                 switch state {
                 case .loading:
                     self?.collectionView.refreshControl?.beginRefreshing()
                     self?.viewModel.eventSubject.send(.load)
-                    
-                case .failureLoading(let error):
+
+                case .failure(let error):
                     self?.collectionView.refreshControl?.endRefreshing()
                     let tryAgain = UIAlertAction(title: R.string.localizable.tryAgain(), style: .default) { [weak self] _ in
                         self?.viewModel.eventSubject.send(.load)
@@ -82,7 +82,7 @@ class ChampionsListViewController: UIViewController {
                     presentViewController.addAction(tryAgain)
                     presentViewController.addAction(cancel)
                     self?.present(presentViewController, animated: true)
-                    
+
                 case .success(let model):
                     guard let `self` = self else { return }
                     self.collectionView.refreshControl?.endRefreshing()
@@ -94,7 +94,7 @@ class ChampionsListViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
+
     private func addCollectionView() {
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
@@ -116,4 +116,3 @@ extension ChampionsListViewController: UICollectionViewDataSourcePrefetching {
     }
 
 }
-

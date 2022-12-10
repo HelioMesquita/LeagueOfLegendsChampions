@@ -1,26 +1,11 @@
 import Combine
-import Nimble
-import Quick
+import XCTest
 
 @testable import LeagueOfLegendsChampions
 
 typealias DataCompletion = (Data?, URLResponse?, Error?) -> Void
 
-class ServiceProvider: ServiceProviderProtocol {
-
-    var customURLSession: URLSession
-
-    var urlSession: URLSession {
-        return customURLSession
-    }
-
-    init(customURLSession: URLSession) {
-        self.customURLSession = customURLSession
-    }
-
-}
-
-class ServiceProviderProtocolTests: QuickSpec {
+class ServiceProviderProtocolTests: XCTestCase {
 
     let correctJsonData = """
         {
@@ -39,7 +24,7 @@ class ServiceProviderProtocolTests: QuickSpec {
           "currentPage" : 1
         }
     """.data(using: .utf8)!
-    
+
     let wrongJsonData = """
         {
           "champions" : [
@@ -58,191 +43,216 @@ class ServiceProviderProtocolTests: QuickSpec {
         }
     """.data(using: .utf8)!
 
-    var subject: ServiceProviderProtocol!
-    var cancellables = Set<AnyCancellable>()
+    var mockURLSession: URLSession!
     let builder = ChampionsListBuilder()
     let request = ChampionsRequest(language: "pt_BR", page: 1)
-    
-    func generateMockURLSession(statusCode: Int = 200, jsonData: Data) -> URLSession {
+    var cancellables = Set<AnyCancellable>()
+
+    override func tearDownWithError() throws {
+        mockURLSession = nil
+        try super.tearDownWithError()
+    }
+
+    func generateMockURLSession(statusCode: Int = 200, jsonData: Data) {
         let url = try! request.asURLRequest().url!
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)
         MockURLProtocol.mockURLs = [url: (nil, jsonData, response)]
 
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.protocolClasses = [MockURLProtocol.self]
-        return URLSession(configuration: sessionConfiguration)
+        mockURLSession = URLSession(configuration: sessionConfiguration)
     }
 
-    override func spec() {
-        super.spec()
+    func testWhenPerformARequestWithSuccessAndCorrectParserItReturnsMockModel() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(jsonData: self.correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(_):
+                        XCTFail()
+                    }
+                },
+                receiveValue: { model in
+                    XCTAssertEqual(model.champions.count, 1)
+                    expectation.fulfill()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
 
-        describe("#execute") {
-            context("when successful request") {
-                context("with a correct parser") {
-                    it("returns body response parsed") {
-                        let mockURLSession = self.generateMockURLSession(jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(_):
-                                        XCTFail()
-                                    }
-                                },
-                                receiveValue: { model in
-                                    expect(model.champions.count).to(equal(1))
-                                })
-                            .store(in: &self.cancellables)
+    func testWhenPerformARequestWithSuccessAndIncorrectParserItReturnsMockModel() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(jsonData: wrongJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.invalidParser)
+                        expectation.fulfill()
                     }
-                }
-                context("with a invalid parser") {
-                    it("returns a error invalid parser") {
-                        let mockURLSession = self.generateMockURLSession(jsonData: self.wrongJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):                                        expect((error)).to(equal(RequestError.invalidParser))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                }
-            }
-            
-            context("when unsuccessful request") {
-                context("with known error") {
-                    it("returns bad request error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 400, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):                                        expect((error)).to(equal(RequestError.badRequest))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                    it("returns unauthorized error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 401, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):                                        expect((error)).to(equal(RequestError.unauthorized))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                    it("returns forbidden error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 403, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):                                        expect((error)).to(equal(RequestError.forbidden))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                    it("returns not found error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 404, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):                                        expect((error)).to(equal(RequestError.notFound))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                    it("returns server error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 500, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):
-                                        expect((error)).to(equal(RequestError.serverError))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                    it("returns unknown error") {
-                        let mockURLSession = self.generateMockURLSession(statusCode: 999, jsonData: self.correctJsonData)
-                        ServiceProvider(customURLSession: mockURLSession).execute(request: self.request, builder: self.builder)
-                            .receive(on: DispatchQueue.main)
-                            .sink(
-                                receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        break
-                                    case .failure(let error):
-                                        expect((error)).to(equal(RequestError.unknownError))
-                                    }
-                                },
-                                receiveValue: { model in
-                                    XCTFail()
-                                })
-                            .store(in: &self.cancellables)
-                    }
-                }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
 
-//                context("with unknown error") {
-//                    beforeEach {
-//                        self.subject = ServiceProvider(customURLSession: mockURLSession)
-//                    }
-//
-//                    it("returns specific error") {
-////                        self.subject.execute(request: MockProvider(), parser: BodyParser.self).done { _ in
-//                            XCTFail()
-////                        }.catch { error in
-////                            expect((error as? RequestError)).to(equal(RequestError.unknownError))
-////                        }
-//                    }
-//                }
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsBadRequestError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 400, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.badRequest)
+                        expectation.fulfill()
 
-            }
-        }
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsUnauthorizedError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 401, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.unauthorized)
+                        expectation.fulfill()
+
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsForbiddenError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 403, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.forbidden)
+                        expectation.fulfill()
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsNotFoundError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 404, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.notFound)
+                        expectation.fulfill()
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsServerError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 500, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.serverError)
+                        expectation.fulfill()
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testWhenPerformARequestWithUnsuccessWithKnowErrorItReturnsUnknownError() {
+        let expectation = XCTestExpectation()
+        generateMockURLSession(statusCode: 999, jsonData: correctJsonData)
+        ServiceProvider(customURLSession: mockURLSession).execute(request: request, builder: builder)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        break
+                    case .failure(let error):
+                        XCTAssertEqual(error, RequestError.unknownError)
+                        expectation.fulfill()
+                    }
+                },
+                receiveValue: { _ in
+                    XCTFail()
+                })
+            .store(in: &self.cancellables)
+        wait(for: [expectation], timeout: 1)
+    }
+
+}
+
+class ServiceProvider: ServiceProviderProtocol {
+
+    var customURLSession: URLSession
+
+    var urlSession: URLSession {
+        return customURLSession
+    }
+
+    init(customURLSession: URLSession) {
+        self.customURLSession = customURLSession
     }
 
 }

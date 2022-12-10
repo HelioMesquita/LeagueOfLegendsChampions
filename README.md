@@ -42,7 +42,5 @@ Double tap on LeagueOfLegendsChampions.xcworkspace
 
 ## Built With
 
-* [Quick](https://github.com/Quick/Quick) - The Swift (and Objective-C) testing framework.
-* [Nimble](https://github.com/Quick/Nimble) - A Matcher Framework for Swift and Objective-C
 * [SDWebImage](https://github.com/SDWebImage/SDWebImage) - Asynchronous image downloader with cache support as a UIImageView category
 * [R.swift](https://github.com/mac-cain13/R.swift) - Get strong typed, autocompleted resources like images, fonts and segues in Swift projects

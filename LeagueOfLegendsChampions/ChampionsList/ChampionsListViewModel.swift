@@ -2,16 +2,16 @@ import Combine
 import Foundation
 
 enum ChampionsViewOutEvent: Equatable {
-    
+
     case loading
-    case failureLoading(RequestError)
+    case failure(RequestError)
     case success(ChampionsListBuilder.Model)
-    
+
     static func == (lhs: ChampionsViewOutEvent, rhs: ChampionsViewOutEvent) -> Bool {
         switch (lhs, rhs) {
         case (.loading, .loading):
             return true
-        case (.failureLoading, .failureLoading):
+        case (.failure, .failure):
             return true
         case (.success, .success):
             return true
@@ -34,20 +34,20 @@ class ChampionsListViewModel {
 
     @Published private(set) var state: ChampionsViewOutEvent = .loading
     let eventSubject = PassthroughSubject<ChampionsViewInEvent, Never>()
-    
+
     private var cancellables = Set<AnyCancellable>()
     private var page = 1
     fileprivate var model: ChampionsListBuilder.Model?
     private let service: ChampionsServiceProtocol
-    
+
     init(service: ChampionsServiceProtocol = ChampionsService()) {
         self.service = service
-        
+
         eventSubject
             .sink { [weak self] in self?.handleEvent($0) }
             .store(in: &cancellables)
     }
-    
+
     private func handleEvent(_ event: ChampionsViewInEvent) {
         switch event {
         case .load:
@@ -55,16 +55,17 @@ class ChampionsListViewModel {
             model = nil
             load()
         case .prefetchNextPage(let index):
-            let hasNextPage = self.model?.hasNextPage ?? false
-            let currentChampion = self.model?.champions[index]
-            let lastChampion = self.model?.champions.last
-            if (hasNextPage && currentChampion == lastChampion) {
+            guard let model = model else { return }
+            let hasNextPage = model.hasNextPage
+            let currentChampion = model.champions[index]
+            let lastChampion = model.champions.last
+            if hasNextPage && currentChampion == lastChampion {
                 page += 1
                 load()
             }
         }
     }
-    
+
     private func load() {
         service.getChampionsList(page: page, language: Locale.preferredLanguages[0] as String)
             .receive(on: DispatchQueue.main)
@@ -74,7 +75,7 @@ class ChampionsListViewModel {
                     case .finished:
                         break
                     case .failure(let error):
-                        self?.state = .failureLoading(error)
+                        self?.state = .failure(error)
                     }
                 },
                 receiveValue: { [weak self] model in
@@ -83,7 +84,7 @@ class ChampionsListViewModel {
                 })
             .store(in: &cancellables)
     }
-    
+
     private func handleModel(_ model: ChampionsListBuilder.Model) -> ChampionsListBuilder.Model {
         let newModel = self.model?.updateModel(model) ?? model
         self.model = newModel

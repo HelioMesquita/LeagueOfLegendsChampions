@@ -1,29 +1,34 @@
-import Quick
-import Nimble
+import XCTest
 
 @testable import LeagueOfLegendsChampions
 
-class RequestProviderProtocolTests: QuickSpec {
+class RequestProviderProtocolTests: XCTestCase {
 
-    let subject: RequestProviderProtocol = MockProvider()
+    var sut: RequestProviderProtocol!
 
-    override func spec() {
-        super.spec()
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        sut = MockProvider()
+    }
 
-        describe("#asURLRequest") {
-            it("returns full url") {
-                expect(try? self.subject.asURLRequest().url?.absoluteString).to(equal("https://google.host/testando?key=value"))
-            }
+    override func tearDownWithError() throws {
+        sut = nil
+        try super.tearDownWithError()
+    }
 
-            it("returns header") {
-                expect(try? self.subject.asURLRequest().allHTTPHeaderFields).to(equal(["Content-Type": "application/json"]))
-            }
+    func testURLRequestMethodItReturnsACorrectURLWithQueryParameters() {
+        let urlString = try? sut.asURLRequest().url?.absoluteString
+        XCTAssertEqual(urlString, "https://google.host/testando?key=value")
+    }
 
-            it("returns body") {
-                expect(try? self.subject.asURLRequest().httpBody).toNot(beNil())
-            }
-        }
+    func testURLRequestMethodItReturnsAllHeaders() {
+        let headers = try? sut.asURLRequest().allHTTPHeaderFields
+        XCTAssertEqual(headers, ["Content-Type": "application/json"])
+    }
 
+    func testURLRequestMethodItReturnsHttbBodyData() {
+        let httpBody = try? sut.asURLRequest().httpBody
+        XCTAssertNotNil(httpBody)
     }
 
 }

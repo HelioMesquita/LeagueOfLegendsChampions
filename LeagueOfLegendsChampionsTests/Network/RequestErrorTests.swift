@@ -1,18 +1,11 @@
-import Quick
-import Nimble
+import XCTest
 
 @testable import LeagueOfLegendsChampions
 
-class RequestErrorTests: QuickSpec {
+class RequestErrorTests: XCTestCase {
 
-    override func spec() {
-        super.spec()
-
-        describe("#localizedDescription") {
-            it("returns text from localizable strings") {
-                expect(RequestError.badRequest.localizedDescription).to(equal(R.string.localizable.badRequest()))
-            }
-        }
+    func testLocalizedDescription() {
+        XCTAssertEqual(RequestError.badRequest.localizedDescription, R.string.localizable.badRequest())
     }
 
 }

@@ -12,13 +12,13 @@ extension ServiceProviderProtocol {
     var jsonDecoder: JSONDecoder {
         return JSONDecoder()
     }
-    
+
     func execute<BuilderType: BuilderProviderProtocol>(request: RequestProviderProtocol, builder: BuilderType) -> AnyPublisher<BuilderType.ModelType, RequestError> {
-        
+
         guard let urlRequest = try? request.asURLRequest() else {
             return Fail(error: RequestError.invalidURL).eraseToAnyPublisher()
         }
-        
+
         return urlSession
             .dataTaskPublisher(for: urlRequest)
             .tryMap { requestData in
@@ -27,7 +27,7 @@ extension ServiceProviderProtocol {
                     throw RequestError.unknownError
                 }
                 let statusCode = httpResponse.statusCode
-                
+
                 if 200...299 ~= statusCode {
                     return requestData.data
                 } else {

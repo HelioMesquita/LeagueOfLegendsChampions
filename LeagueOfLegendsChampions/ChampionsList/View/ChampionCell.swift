@@ -44,10 +44,10 @@ class ChampionCell: UICollectionViewCell {
             imageView.topAnchor.constraint(equalTo: topAnchor),
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
+
     func setCell(_ champion: ChampionsListBuilder.Model.ChampionModel) {
         titleLabel.text = champion.name
         imageView.sd_setImage(with: champion.image)

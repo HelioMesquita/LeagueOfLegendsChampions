@@ -6,7 +6,7 @@ protocol ChampionsServiceProtocol {
 }
 
 class ChampionsService: ChampionsServiceProtocol {
-    
+
     private let serviceProvider: ServiceProviderProtocol
 
     init(serviceProvider: ServiceProviderProtocol = ServiceProvider()) {
@@ -17,5 +17,5 @@ class ChampionsService: ChampionsServiceProtocol {
         let request = ChampionsRequest(language: language, page: page)
         return serviceProvider.execute(request: request, builder: ChampionsListBuilder())
     }
-    
+
 }

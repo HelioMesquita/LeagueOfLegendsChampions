@@ -15,15 +15,15 @@ class MockURLProtocol: URLProtocol {
     override func startLoading() {
         if let url = request.url {
             if let (error, data, response) = MockURLProtocol.mockURLs[url] {
-                
+
                 if let responseStrong = response {
                     self.client?.urlProtocol(self, didReceive: responseStrong, cacheStoragePolicy: .notAllowed)
                 }
-                
+
                 if let dataStrong = data {
                     self.client?.urlProtocol(self, didLoad: dataStrong)
                 }
-                
+
                 if let errorStrong = error {
                     self.client?.urlProtocol(self, didFailWithError: errorStrong)
                 }

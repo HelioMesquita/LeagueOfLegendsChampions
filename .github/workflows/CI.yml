@@ -12,10 +12,13 @@ on:
 jobs:
   build-and-test:
 
-    runs-on: maci9
+    runs-on: maci7
 
     steps:
     - uses: actions/checkout@v3
     - name: Build and Test
-      run: xcodegen
+      run: |
+        xcodegen
+        pod install
+        xcodebuild build-for-testing -workspace LeagueOfLegendsChampions.xcworkspace -scheme LeagueOfLegendsChampions -destination generic/platform=iOS
 

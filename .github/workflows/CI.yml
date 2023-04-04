@@ -16,8 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Xcodegen
+      run: xcodegen
     - name: Build and Test
-      run: |
-        xcodegen
-        xcodebuild build-for-testing -project LeagueOfLegendsChampions.xcodeproj -scheme LeagueOfLegendsChampions
+      run: xcodebuild build-for-testing -project LeagueOfLegendsChampions.xcodeproj -scheme LeagueOfLegendsChampions
 

@@ -19,5 +19,5 @@ jobs:
     - name: Build and Test
       run: |
         xcodegen
-        xcodebuild build-for-testing -workspace LeagueOfLegendsChampions.xcodeproj -scheme LeagueOfLegendsChampions -destination generic/platform=iOS
+        xcodebuild build-for-testing -project LeagueOfLegendsChampions.xcodeproj -scheme LeagueOfLegendsChampions -destination generic/platform=iOS
 

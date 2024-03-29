@@ -1,5 +1,7 @@
 # LeagueOfLegendsChampions
 
+❌ THE API OF THIS APP STOPED WORKING ❌
+
 [![Swift 5.3](https://img.shields.io/badge/Swift-5.3-blue.svg?style=flat)](https://swift.org)
 [![Xcode 14.1.0](https://img.shields.io/badge/Xcode-14.1.0-blue.svg?style=flat)](https://developer.apple.com/xcode/)
 
